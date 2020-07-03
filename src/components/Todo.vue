@@ -1,21 +1,26 @@
 <template>
   <div class="todo-wrapper" v-if="isValid">
       <input  @change="changeStatus" type="checkbox" :checked="handleCheck"/>
-      <label :class="{'check': todo.status }">{{ todo.name }}</label>
+      <Input :class="{'check': todo.status }" :value="todo.name" @keydown.delete="handleDelete" />
   </div>
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, watchEffect, watch, reactive, toRefs } from 'vue'
+import Input from './Input.vue'
+
 export default {
     name: "Todo",
+    components: {
+        Input
+    },
     props:{
         todo:{
             type: Object,
             default: () => {}
         }
     },
-    setup({ todo }){
+    setup({ todo }, { emit }){
         const isValid = computed(() => Object.keys(todo).length > 0)
         const handleCheck = computed(() => todo.status)
 
@@ -23,10 +28,28 @@ export default {
             todo.status = !todo.status
         }
 
+        const deleteTodo = () => {
+            emit("deleteTodo", todo)
+            console.log("todo a ser dletado(compnente todo)", todo.name)
+        }
+
+        const isEmptyString = (value) => {
+            return value.length === 0
+        }
+
+        const handleDelete = (event) => {
+            const name = event.target.value
+
+            if(isEmptyString(name)){
+                deleteTodo()
+            }
+        }
+
         return {
             isValid,
             handleCheck,
-            changeStatus
+            changeStatus,
+            handleDelete
         }
     }
 }
@@ -35,7 +58,7 @@ export default {
 <style  scoped>
 .todo-wrapper{
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     padding: 5px;
     width: 100%;
 }

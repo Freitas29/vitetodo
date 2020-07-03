@@ -42,6 +42,5 @@ input{
 input:focus{
   border: none;
   outline: none;
-  border-bottom: 1px solid #ddd;
 }
 </style>

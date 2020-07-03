@@ -2,6 +2,7 @@
   <main>
     <div class="content">
       <Todo
+        @deleteTodo="handleDeleteTodo"
         v-for="(todo, index) in todos"
         :key="index"
         :todo="todo"
@@ -23,17 +24,16 @@ export default {
     Todo
   },
 
-  setup(props, context){
+  setup(props, { emit, attrs }){
     const state = reactive({
-      todos: [{}],
+      todos: [],
       todo: ""
     })
 
-
     function handleSaveTodo(event){
-      const { todo } = state
+      const { todo, todos } = state
       
-      state.todos.push({
+      todos.push({
         name: todo,
         finished: false
       })
@@ -41,12 +41,44 @@ export default {
       clearInput()
     }
 
+    const hasTodo = (deleted) => {
+      if(typeof deleted == "undefined") return false
+
+      const { todos } = state
+
+      const size = todos.find(todo => todo.name === deleted.name)
+
+      return typeof size === "object"
+    }
+
+    const findTodo = (deletedTodo) => {
+      const { todos } = state
+      const todo = todos.find(todo => todo.name === deletedTodo.name)
+      return todo ?? deletedTodo
+    }
+
+    const updatedTodos = (deleted) => {
+      const { todos } = state
+      
+      debugger  
+      if(!hasTodo(deleted)){
+        return todos
+      }
+
+      return todos.filter(todo => todo.name !== deleted.name)
+    }
+
+    const handleDeleteTodo = (deletedTodo) => {
+      const deleted = findTodo(deletedTodo)
+      state.todos = updatedTodos(deleted)
+    }
+
     function clearInput(){
       state.todo = ""
     }
 
 
-    return {...toRefs(state), handleSaveTodo}
+    return {...toRefs(state), handleSaveTodo, handleDeleteTodo}
   }
 }
 </script>
