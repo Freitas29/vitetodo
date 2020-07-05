@@ -30,7 +30,6 @@ export default {
 
         const deleteTodo = () => {
             emit("deleteTodo", todo)
-            console.log("todo a ser dletado(compnente todo)", todo.name)
         }
 
         const isEmptyString = (value) => {

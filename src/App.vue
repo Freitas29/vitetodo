@@ -2,9 +2,9 @@
   <main>
     <div class="content">
       <Todo
-        @deleteTodo="handleDeleteTodo"
+        @deleteTodo="handleDeleteTodo(todo)"
         v-for="(todo, index) in todos"
-        :key="index"
+        :key="todo.name + index"
         :todo="todo"
       />
       <Input v-model:todo="todo" @keydown.enter="handleSaveTodo"/>
@@ -41,27 +41,21 @@ export default {
       clearInput()
     }
 
-    const hasTodo = (deleted) => {
+    const hasTodo = (todos, deleted) => {
       if(typeof deleted == "undefined") return false
-
-      const { todos } = state
 
       const size = todos.find(todo => todo.name === deleted.name)
 
       return typeof size === "object"
     }
 
-    const findTodo = (deletedTodo) => {
-      const { todos } = state
+    const findTodo = (todos, deletedTodo) => {
       const todo = todos.find(todo => todo.name === deletedTodo.name)
       return todo ?? deletedTodo
     }
 
-    const updatedTodos = (deleted) => {
-      const { todos } = state
-      
-      debugger  
-      if(!hasTodo(deleted)){
+    const updatedTodos = (todos, deleted) => {
+      if(!hasTodo(todos,deleted)){
         return todos
       }
 
@@ -69,8 +63,9 @@ export default {
     }
 
     const handleDeleteTodo = (deletedTodo) => {
-      const deleted = findTodo(deletedTodo)
-      state.todos = updatedTodos(deleted)
+      let { todos }  = state
+      const deleted = findTodo(todos, deletedTodo)
+      state.todos = updatedTodos(todos, deleted)
     }
 
     function clearInput(){
