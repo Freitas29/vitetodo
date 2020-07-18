@@ -24,6 +24,8 @@
 <script>
 import Input from '../components/Input.vue'
 import { reactive, toRefs } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import api from '../services/api'
 
 export default{
     name: "Login",
@@ -36,6 +38,29 @@ export default{
             password: ""
         })
 
+        const router = useRouter()
+
+        const handleRouteSignIn = (status, data) => {
+            if(status !== 200){
+                console.log("Senha ou email incorreto")
+            }
+
+            if(data.hasOwnProperty("token")){                
+                router.push("/projects")
+            }else{
+                console.log("algo deu errado")
+            }
+        }
+
+        const requestSignIn = async (email, password) => {
+            const { data, status } = await api.post("/sign_in", {
+                email,
+                password
+            })
+            
+            handleRouteSignIn(status, data)
+        }
+
         const handleSignIn = () => {
             const { password, email } = state
             
@@ -43,7 +68,7 @@ export default{
                 return
             }
 
-            console.log("é valido")
+            requestSignIn(email, password)
         }
 
         const isValid = value => {
