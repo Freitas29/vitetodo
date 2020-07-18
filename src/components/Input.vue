@@ -1,8 +1,8 @@
 <template>
   <input
-    :value="todo"
+    :value="inputValue"
     @input="handleInput($event.target.value)"
-    placeholder="Digite uma tarefa"/>
+    :placeholder="holder"/>
   
 </template>
 
@@ -10,14 +10,18 @@
 import { reactive, toRefs, watch } from 'vue'
 export default {
   props: {
-    todo: {
+    inputValue: {
       type: String,
       default: ""
+    },
+    holder: {
+      type: String,
+      default: "Digite uma tarefa"
     }
   },
   setup(props, context){
     function handleInput(value){
-      context.emit("update:todo", value)
+      context.emit("update:inputValue", value)
     }
 
     return {

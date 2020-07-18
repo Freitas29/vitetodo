@@ -7,7 +7,7 @@
         :key="todo.name + index"
         :todo="todo"
       />
-      <Input v-model:todo="todo" @keydown.enter="handleSaveTodo"/>
+      <Input v-model:inputValue="todo" @keydown.enter="handleSaveTodo"/>
     </div>
   </main>
 </template>
