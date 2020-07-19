@@ -4,7 +4,7 @@
       <Todo
         @deleteTodo="handleDeleteTodo(todo)"
         v-for="(todo, index) in todos"
-        :key="todo.name + index"
+        :key="todo.id || todo.name + index"
         :todo="todo"
       />
       <Input v-model:inputValue="todo" @keydown.enter="handleSaveTodo"/>
@@ -16,6 +16,9 @@
 import Input from '../components/Input.vue'
 import Todo from '../components/Todo.vue'
 import { reactive, toRefs, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import api from '../services/api'
+import { getToken } from '../utils/utils'
 
 export default {
   name: 'App',
@@ -30,6 +33,47 @@ export default {
       todo: ""
     })
 
+    const route = useRoute()
+    
+    onMounted(async () => {
+        const { id } = route.params
+        const todos = await getTodos(id)
+        console.log(todos)
+        state.todos = todos
+    })
+
+    const getTodos = async id => {
+        const token = getToken()
+        const { data } = await api.get(`/projects/${id}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+
+        return data.todos
+    }
+
+    const saveTodo = (todo) => {
+        const token = getToken()
+        const { id } = route.params
+        
+        requestSaveTodo(id, todo)
+    }
+
+    const requestSaveTodo = (projectId, name) => {
+        const token = getToken()
+        api.post("/todos", {
+            todo: {
+                project_id: projectId,
+                name
+            }
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+    }
+
     function handleSaveTodo(event){
       const { todo, todos } = state
       
@@ -37,6 +81,8 @@ export default {
         name: todo,
         finished: false
       })
+
+      saveTodo(todo)
 
       clearInput()
     }
