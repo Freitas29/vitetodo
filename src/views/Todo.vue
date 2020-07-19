@@ -112,6 +112,16 @@ export default {
         })
     }
 
+    const requestDeleteTodo = todo => {
+      const token = getToken()
+
+      api.delete(`/todos/${todo.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+    }
+
     const hasTodo = (todos, deleted) => {
       if(typeof deleted == "undefined") return false
 
@@ -136,6 +146,7 @@ export default {
     const handleDeleteTodo = (deletedTodo) => {
       let { todos }  = state
       const deleted = findTodo(todos, deletedTodo)
+      requestDeleteTodo(deleted)
       state.todos = updatedTodos(todos, deleted)
     }
 
