@@ -26,6 +26,7 @@ import Input from '../components/Input.vue'
 import { reactive, toRefs } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
+import { isEmptyString } from '../utils/utils.js'
 
 export default{
     name: "Login",
@@ -45,11 +46,17 @@ export default{
                 console.log("Senha ou email incorreto")
             }
 
-            if(data.hasOwnProperty("token")){                
+            if(data.hasOwnProperty("token")){ 
+                setLocalStorage(data.token)
+                         
                 router.push("/projects")
             }else{
                 console.log("algo deu errado")
             }
+        }
+
+        const setLocalStorage = value => {
+            localStorage.setItem("token", value)
         }
 
         const requestSignIn = async (email, password) => {
@@ -64,16 +71,11 @@ export default{
         const handleSignIn = () => {
             const { password, email } = state
             
-            if(!isValid(password) && !isValid(email)){
+            if(isEmptyString(password) && isEmptyString(email)){
                 return
             }
 
             requestSignIn(email, password)
-        }
-
-        const isValid = value => {
-            const regex = new RegExp(/\S/g)
-            return regex.test(value)
         }
 
         return { ...toRefs(state), handleSignIn }
