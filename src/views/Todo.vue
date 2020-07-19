@@ -6,6 +6,7 @@
         v-for="(todo, index) in todos"
         :key="todo.id || todo.name + index"
         :todo="todo"
+        @updateTodo="handleUpdateTodo(todo)"
       />
       <Input v-model:inputValue="todo" @keydown.enter="handleSaveTodo"/>
     </div>
@@ -38,7 +39,6 @@ export default {
     onMounted(async () => {
         const { id } = route.params
         const todos = await getTodos(id)
-        console.log(todos)
         state.todos = todos
     })
 
@@ -87,6 +87,31 @@ export default {
       clearInput()
     }
 
+    const handleUpdateTodo = todo => {
+      updateTodo(todo)
+    }
+
+    const updateTodo = todo => {
+        requestUpdateTodo(todo)
+    }
+
+    const requestUpdateTodo = todo => {
+        const token = getToken()
+
+        const { name, finished } = todo
+        
+        api.put(`/todos/${todo.id}`, {
+            todo: {
+                name,
+                finished
+            }
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+    }
+
     const hasTodo = (todos, deleted) => {
       if(typeof deleted == "undefined") return false
 
@@ -119,7 +144,12 @@ export default {
     }
 
 
-    return {...toRefs(state), handleSaveTodo, handleDeleteTodo}
+    return {
+      ...toRefs(state),
+      handleSaveTodo,
+      handleDeleteTodo,
+      handleUpdateTodo
+    }
   }
 }
 </script>

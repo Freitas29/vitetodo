@@ -1,7 +1,7 @@
 <template>
   <div class="todo-wrapper" v-if="isValid">
       <input  @change="changeStatus" type="checkbox" :checked="handleCheck"/>
-      <Input :class="{'check': todo.status }" :value="todo.name" @keydown.delete="handleDelete" />
+      <Input :class="{'check': todo.finished }" :value="todo.name" @keydown.delete="handleDelete" />
   </div>
 </template>
 
@@ -22,10 +22,11 @@ export default {
     },
     setup({ todo }, { emit }){
         const isValid = computed(() => Object.keys(todo).length > 0)
-        const handleCheck = computed(() => todo.status)
+        const handleCheck = computed(() => todo.finished)
 
         const changeStatus = () => {
-            todo.status = !todo.status
+            todo.finished = !todo.finished
+            emit("updateTodo", todo)
         }
 
         const deleteTodo = () => {
